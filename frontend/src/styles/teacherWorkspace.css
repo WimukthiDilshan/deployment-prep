@@ -1,0 +1,419 @@
+.teacher-workspace-layout {
+  background:
+    radial-gradient(circle at 92% 4%, rgba(96, 165, 250, 0.14), transparent 24rem),
+    #f4f7fc;
+}
+
+.teacher-workspace-content {
+  display: grid;
+  gap: 24px;
+}
+
+.teacher-workspace-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 178px;
+  padding: clamp(26px, 4vw, 42px);
+  overflow: hidden;
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  border-radius: 22px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 86% 10%, rgba(191, 219, 254, 0.3), transparent 25%),
+    linear-gradient(135deg, #102b6a, #2563eb);
+  box-shadow: 0 24px 50px -30px rgba(30, 64, 175, 0.74);
+}
+
+.teacher-workspace-hero::after {
+  content: '';
+  position: absolute;
+  right: -58px;
+  bottom: -92px;
+  width: 230px;
+  height: 230px;
+  border: 38px solid rgba(255, 255, 255, 0.07);
+  border-radius: 50%;
+}
+
+.teacher-workspace-hero > div {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+}
+
+.teacher-workspace-hero .teacher-dashboard-eyebrow { color: #bfdbfe; }
+.teacher-workspace-hero h1 { margin: 8px 0 10px; color: #fff; font-size: clamp(1.7rem, 3vw, 2.4rem); }
+.teacher-workspace-hero p { margin: 0; max-width: 650px; color: #dbeafe; line-height: 1.7; }
+
+.teacher-workspace-hero-badge {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 0 7px rgba(255, 255, 255, 0.05);
+  font-size: 0.92rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.teacher-workspace-card {
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid #dce7f7;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 42px -32px rgba(30, 64, 175, 0.48);
+}
+
+.teacher-workspace-card-heading { margin-bottom: 22px; }
+.teacher-workspace-card-heading h2 { margin: 0 0 7px; color: #172033; font-size: 1.35rem; }
+.teacher-workspace-card-heading p { margin: 0; color: #64748b; line-height: 1.65; }
+
+.teacher-workspace-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.teacher-workspace-action {
+  display: grid;
+  gap: 8px;
+  min-height: 150px;
+  padding: 24px;
+  border: 1px solid #cfe0f7;
+  border-radius: 17px;
+  color: #1e3a8a;
+  background: linear-gradient(145deg, #fff, #eff6ff);
+  text-align: left;
+  cursor: pointer;
+  transition: 170ms ease;
+}
+
+.teacher-workspace-action:hover,
+.teacher-workspace-action:focus-visible {
+  border-color: #60a5fa;
+  outline: none;
+  box-shadow: 0 18px 32px -24px rgba(37, 99, 235, 0.7);
+  transform: translateY(-2px);
+}
+
+.teacher-workspace-action-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+.teacher-workspace-action strong { margin-top: 5px; color: #172554; font-size: 1.04rem; }
+.teacher-workspace-action small { color: #64748b; font-size: 0.84rem; line-height: 1.55; }
+
+.teacher-workspace-form { display: grid; gap: 12px; }
+.teacher-workspace-form .form-label { color: #1e3a8a; font-weight: 750; }
+.teacher-workspace-form .form-input {
+  width: 100%;
+  border: 1px solid #cbdcf2;
+  color: #172033;
+  background: #f8fbff;
+}
+.teacher-workspace-form .form-input:focus {
+  border-color: #3b82f6;
+  outline: 3px solid rgba(59, 130, 246, 0.14);
+}
+
+.teacher-workspace-primary-button,
+.teacher-workspace-secondary-button {
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 11px;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.teacher-workspace-primary-button {
+  border: 1px solid #2563eb;
+  color: #fff;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 12px 24px -16px rgba(37, 99, 235, 0.9);
+}
+
+.teacher-workspace-secondary-button {
+  border: 1px solid #cbdcf2;
+  color: #1e3a8a;
+  background: #eff6ff;
+}
+
+.teacher-workspace-primary-button:hover:not(:disabled),
+.teacher-workspace-secondary-button:hover:not(:disabled) { filter: brightness(0.97); transform: translateY(-1px); }
+.teacher-workspace-primary-button:disabled,
+.teacher-workspace-secondary-button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.teacher-workspace-answer {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #d8e6f8;
+  border-radius: 15px;
+  color: #26344d;
+  background: #f8fbff;
+}
+
+.teacher-workspace-answer-label { margin: 0 0 9px; color: #1d4ed8; font-size: 0.75rem; font-weight: 850; letter-spacing: 0.08em; text-transform: uppercase; }
+.teacher-workspace-error { margin: 14px 0 0; color: #b91c1c; white-space: pre-wrap; }
+
+.teacher-chat-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 13px;
+  min-height: 360px;
+  max-height: min(58vh, 620px);
+  margin-bottom: 16px;
+  padding: 16px;
+  overflow-y: auto;
+  border: 1px solid #dce7f7;
+  border-radius: 16px;
+  background: #f8fbff;
+}
+
+.teacher-chat-empty { margin: auto; max-width: 470px; color: #64748b; text-align: center; line-height: 1.65; }
+.teacher-chat-message { max-width: 85%; padding: 13px 16px; border-radius: 15px; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06); }
+.teacher-chat-message.is-user { align-self: flex-end; border-bottom-right-radius: 5px; color: #fff; background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.teacher-chat-message.is-assistant { align-self: flex-start; border: 1px solid #d8e6f8; border-bottom-left-radius: 5px; color: #27364f; background: #fff; }
+.teacher-chat-role { margin-bottom: 5px; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; opacity: 0.78; text-transform: uppercase; }
+.teacher-chat-loading { align-self: flex-start; color: #64748b; font-size: 0.88rem; }
+.teacher-chat-composer { display: grid; gap: 12px; }
+.teacher-chat-actions { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 700px) {
+  .teacher-workspace-actions { grid-template-columns: 1fr; }
+  .teacher-workspace-hero-badge { display: none; }
+  .teacher-chat-message { max-width: 94%; }
+}
+
+.upload-lesson-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.upload-lesson-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.upload-lesson-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 14px 16px;
+  border: 1px solid #dce7f7;
+  border-radius: 16px;
+  background: #fff;
+  color: #64748b;
+}
+
+.upload-lesson-step strong {
+  display: block;
+  color: #172033;
+  font-size: 0.95rem;
+}
+
+.upload-lesson-step small {
+  display: block;
+  margin-top: 2px;
+  line-height: 1.45;
+}
+
+.upload-lesson-step-index {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  color: #1e3a8a;
+  background: #eff6ff;
+  font-weight: 800;
+}
+
+.upload-lesson-step.is-active {
+  border-color: #93c5fd;
+  box-shadow: 0 14px 28px -24px rgba(37, 99, 235, 0.7);
+}
+
+.upload-lesson-step.is-active .upload-lesson-step-index,
+.upload-lesson-step.is-done .upload-lesson-step-index {
+  color: #fff;
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+}
+
+.upload-lesson-step.is-done {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.upload-lesson-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.upload-lesson-sections.is-waiting {
+  opacity: 0.62;
+}
+
+.upload-lesson-hint {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.upload-lesson-status {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.upload-lesson-file {
+  padding: 14px;
+  border: 1px dashed #93b4e2;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.upload-lesson-file .form-input {
+  background: #fff;
+}
+
+.upload-lesson-thumb {
+  width: 100%;
+  max-width: 320px;
+  display: block;
+  border-radius: 12px;
+  border: 1px solid #d8e6f8;
+}
+
+.upload-lesson-subsection {
+  margin-top: 8px;
+  padding: 16px;
+  border: 1px solid #d8e6f8;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f8fbff, #fff);
+}
+
+.upload-lesson-hierarchy {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid #d8e6f8;
+  border-radius: 14px;
+  background: #f8fbff;
+}
+
+.upload-lesson-hierarchy h3 {
+  margin: 0 0 6px;
+  color: #172033;
+  font-size: 1rem;
+}
+
+.upload-lesson-hierarchy p {
+  margin: 0 0 10px;
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.upload-lesson-hierarchy ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.upload-lesson-hierarchy li + li {
+  margin-top: 4px;
+}
+
+.upload-lesson-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.upload-lesson-add-another.is-ready {
+  border-color: #86efac;
+  color: #166534;
+  background: #f0fdf4;
+}
+
+.upload-lesson-message {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  text-align: center;
+}
+
+.upload-lesson-queue .glass-panel {
+  margin-bottom: 18px;
+  background: #fff;
+}
+
+.upload-lesson-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.upload-lesson-grid .teacher-workspace-primary-button,
+.upload-lesson-grid .teacher-workspace-secondary-button {
+  width: 100%;
+}
+
+.upload-lesson-sections .form-label,
+.upload-lesson-subsection .form-label {
+  color: #1e3a8a;
+  font-weight: 700;
+}
+
+.upload-lesson-sections .form-input,
+.upload-lesson-subsection .form-input {
+  width: 100%;
+  border: 1px solid #cbdcf2;
+  color: #172033;
+  background: #f8fbff;
+}
+
+.upload-lesson-sections .form-input:focus,
+.upload-lesson-subsection .form-input:focus {
+  border-color: #3b82f6;
+  outline: 3px solid rgba(59, 130, 246, 0.14);
+}
+
+@media (max-width: 980px) {
+  .upload-lesson-grid,
+  .upload-lesson-steps {
+    grid-template-columns: 1fr;
+  }
+}
+

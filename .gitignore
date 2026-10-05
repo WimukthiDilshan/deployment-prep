@@ -1,0 +1,34 @@
+# Environment files and secrets (keep example templates)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Node dependencies and build output
+**/node_modules/
+**/dist/
+**/build/
+
+# Python environments, caches, and test artifacts
+**/.venv/
+**/venv/
+**/__pycache__/
+*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+
+# Local uploads and temporary media
+**/uploads/
+*.mp4
+*.wav
+*.mp3
+
+# Editor and operating system files
+.idea/
+**/.idea/
+.vscode/
+Thumbs.db
+.DS_Store
+CognitiveStyleBackend/__pycache__/main.cpython-313.pyc
+CognitiveStyleBackend/__pycache__/main.cpython-313.pyc
+CognitiveStyleBackend/database/__pycache__/connection.cpython-313.pyc

@@ -1,0 +1,128 @@
+.admin-page {
+  min-height: 100vh;
+  padding: 3rem clamp(1rem, 4vw, 4rem);
+  background: linear-gradient(145deg, #eff6ff 0%, #f8fafc 52%, #eef2ff 100%);
+  color: #0f172a;
+}
+
+.admin-header {
+  max-width: 1180px;
+  margin: 0 auto 2rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-header h1 {
+  margin: 0.25rem 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.admin-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.admin-eyebrow {
+  color: #2563eb !important;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-logout {
+  background: #fff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.admin-panel {
+  max-width: 1180px;
+  margin: 0 auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 65px -45px rgba(15, 23, 42, 0.55);
+}
+
+.admin-alert {
+  max-width: 1180px;
+  margin: 0 auto 1rem;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-table td:first-child span {
+  display: block;
+  margin-top: 0.2rem;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.admin-status {
+  display: inline-flex;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.admin-status--pending { background: #fef3c7; color: #92400e; }
+.admin-status--approved { background: #dcfce7; color: #166534; }
+.admin-status--rejected { background: #fee2e2; color: #991b1b; }
+
+.admin-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-actions .btn {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.admin-accept { background: #16a34a; color: #fff; }
+.admin-reject { background: #dc2626; color: #fff; }
+
+.admin-actions .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.admin-empty {
+  padding: 3rem;
+  text-align: center;
+  color: #64748b;
+}
+
+@media (max-width: 680px) {
+  .admin-page { padding-top: 1.5rem; }
+  .admin-header { align-items: center; }
+  .admin-table th,
+  .admin-table td { padding: 0.8rem; }
+}
