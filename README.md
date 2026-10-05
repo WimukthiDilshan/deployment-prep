@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Cognitive Load Learning Platform
 
 This repository contains a multi-service learning analytics platform for course delivery, cognitive-load prediction, cognitive-style tracking, explainable AI, and teacher-facing recommendations.
@@ -374,3 +375,6 @@ The available branches show how the current project grew:
 - `origin/Cognitive_Load` is closest to the broad integrated service layout.
 - `origin/Congitive_Load` contains an earlier frontend/backend/cognitive-load slice.
 
+=======
+# deployment-prep
+>>>>>>> origin/main
