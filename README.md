@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Cognitive Load Learning Platform
 
 This repository contains a multi-service learning analytics platform for course delivery, cognitive-load prediction, cognitive-style tracking, explainable AI, and teacher-facing recommendations.
@@ -42,7 +41,6 @@ The root README was prepared after reviewing the current `main` branch and the a
 | `COGNITIVE-LOAD-API/` | FastAPI cognitive-load prediction service using the trained model in `model/`. |
 | `lime_ai/` | FastAPI service that calls the prediction API, stores prediction rows, and exposes LIME-related prediction endpoints. |
 | `sharp_ai/` | FastAPI SHAP explanation service for saved cognitive-load predictions. |
-| `explanable_ai/` | FastAPI explainability backend for class, lesson, student summaries, SHAP/LIME explanations, and GPT-generated explanation text. |
 | `CognitiveStyleBackend/` | FastAPI backend for visual-verbal, analytic-wholistic, gaze, cursor, question-runner, assist-question, and learner-profile features. |
 | `cognitive_style_ai/` | Combined LIME + SHAP service for persisted student cognitive-style explanations and top-three feature aggregation. |
 | `report_assets/` | Project report/supporting assets. |
@@ -63,7 +61,6 @@ API Gateway :4000
   |-- /api/lime-ai -> lime_ai :8110
   |-- /api/shap-ai -> sharp_ai :8011
   |-- /api/cognitive-style-ai -> cognitive_style_ai :8112
-  |-- /api/explainable -> explanable_ai :8000
   |-- /api/recommendation -> recommendation_ai
   |-- /cognitive-style -> CognitiveStyleBackend :8003
 ```
@@ -86,7 +83,6 @@ API Gateway :4000
 | Resource upload service | `http://localhost:5000` |
 | GPT service | `http://localhost:5002` |
 | Recommendation service | `http://localhost:5002` by default, but use a different `PORT` if running with `gpt-service` |
-| Explainable AI service | `http://localhost:8000` |
 | Cognitive-load prediction API | commonly run on `http://127.0.0.1:8021` from its launcher |
 | LIME AI service | `http://localhost:8110` |
 | SHAP AI service | `http://localhost:8011` |
@@ -123,7 +119,6 @@ FRONTEND_URLS=http://localhost:5174,http://127.0.0.1:5173
 BACKEND_SERVICE_URL=http://localhost:5001
 GPT_SERVICE_URL=http://localhost:5002
 RESOURCE_UPLOAD_URL=http://localhost:5000
-EXPLAINABLE_AI_BACKEND_URL=http://localhost:8000
 LIME_AI_SERVICE_URL=http://localhost:8110
 SHAP_AI_SERVICE_URL=http://localhost:8011
 RECOMMENDATION_AI_URL=http://localhost:5003
@@ -223,20 +218,6 @@ MODEL_API_PREDICT_PATH=/predict
 MODEL_API_TIMEOUT_SECONDS=30
 ```
 
-### `explanable_ai/.env`
-
-```env
-DB_HOST=localhost
-DB_PORT=3306
-USER=root
-PASSWORD=
-DB_NAME=explanable_ai
-GPT_API_KEY=your_gpt_key
-GPT_MODEL=gpt-4o-mini
-EXPLAINABILITY_MICROSERVICE_URL=http://127.0.0.1:8021
-EXPLAINABILITY_MICROSERVICE_PATH=/predict
-```
-
 ### `CognitiveStyleBackend/.env`
 
 ```env
@@ -285,11 +266,6 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 
-cd "E:\sliit projects\cognitive-load-api\explanable_ai"
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-
 cd "E:\sliit projects\cognitive-load-api\CognitiveStyleBackend"
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -303,7 +279,7 @@ python -m pip install -r requirements.txt
 Start databases first:
 
 - MongoDB for `backend`, `Resource_upload`, `gpt-service`, and `CognitiveStyleBackend`.
-- MySQL for `COGNITIVE-LOAD-API`, `lime_ai`, `sharp_ai`, `explanable_ai`, and `recommendation_ai`.
+- MySQL for `COGNITIVE-LOAD-API`, `lime_ai`, `sharp_ai`, `cognitive_style_ai`, and `recommendation_ai`.
 
 Start the services in separate terminals:
 
@@ -332,7 +308,6 @@ GET http://localhost:8011/api/v1/health
 | `/api/cognitive-load/*` | `COGNITIVE-LOAD-API` | Prediction, raw event, feature-window, and XAI data routes. |
 | `/api/lime-ai/*` | `lime_ai` | Prediction persistence and LIME-related service routes. |
 | `/api/shap-ai/*` | `sharp_ai` | SHAP explanation service routes. |
-| `/api/explainable/*` | `explanable_ai` | Explainable summaries and explanation generation. |
 | `/api/recommendation/*` | `recommendation_ai` | Lesson analysis and teacher recommendations. |
 | `/cognitive-style/*` | `CognitiveStyleBackend` | Gaze, cursor, cognitive style, assist question, and learner profile APIs. |
 
@@ -344,7 +319,7 @@ GET http://localhost:8011/api/v1/health
 4. The frontend posts cognitive-load raw events through the gateway.
 5. `COGNITIVE-LOAD-API` extracts features, predicts cognitive load, stores logs, and can dispatch completed windows to `lime_ai`.
 6. `lime_ai` stores prediction records in MySQL for later analysis.
-7. `sharp_ai` and `explanable_ai` produce SHAP/LIME explanations and summaries.
+7. `sharp_ai` produces SHAP explanations; `lime_ai` produces LIME explanations and summaries.
 8. `recommendation_ai` analyzes lesson-level cognitive-load summaries and returns teacher guidance.
 
 ## Database Notes
@@ -368,13 +343,8 @@ GET http://localhost:8011/api/v1/health
 The available branches show how the current project grew:
 
 - `origin/met_upload` and `origin/wimukthi` focus on course/resource upload plus the frontend/backend/gateway base.
-- `origin/add_basic_explainable` adds the first explainability backend.
 - `origin/add_lime` adds the cognitive-load API, GPT service, recommendation service, and LIME-related integration.
 - `origin/course_upload` expands course upload and cognitive-load integration.
-- `origin/image-gen` and `origin/image-part-final` include the fuller service set: cognitive-load API, cognitive-style backend, LIME, SHAP, GPT, recommendation, explainability, upload, gateway, backend, and frontend.
+- `origin/image-gen` and `origin/image-part-final` include the fuller service set: cognitive-load API, cognitive-style backend, LIME, SHAP, GPT, recommendation, upload, gateway, backend, and frontend.
 - `origin/Cognitive_Load` is closest to the broad integrated service layout.
 - `origin/Congitive_Load` contains an earlier frontend/backend/cognitive-load slice.
-
-=======
-# deployment-prep
->>>>>>> origin/main

@@ -17,8 +17,6 @@ const RESOURCE_UPLOAD_URL =
   process.env.RESOURCE_UPLOAD_URL || "http://localhost:5000";
 const GATEWAY_SHARED_SECRET =
   process.env.GATEWAY_SHARED_SECRET || "resource_gateway_secret_2026";
-const EXPLAINABLE_AI_BACKEND_URL =
-  process.env.EXPLAINABLE_AI_BACKEND_URL || "http://localhost:8000";
 const LIME_AI_SERVICE_URL =
   process.env.LIME_AI_SERVICE_URL || "http://localhost:8110";
 const SHAP_AI_SERVICE_URL =
@@ -237,15 +235,6 @@ app.use(
   createProxyMiddleware({
     target: RESOURCE_UPLOAD_URL,
     changeOrigin: true,
-  })
-);
-
-app.use(
-  "/api/explainable",
-  createProxyMiddleware({
-    target: EXPLAINABLE_AI_BACKEND_URL,
-    changeOrigin: true,
-    pathRewrite: (path) => `/api${path}`,
   })
 );
 
