@@ -1,0 +1,20 @@
+{
+  "name": "exam-service",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "backfill:ocr": "node src/scripts/backfillOcrChunks.js",
+    "test:pdf": "python -m unittest discover -s tests -p test_pdf_extraction.py",
+    "test:mcq": "node --test tests/geminiMcq.test.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "multer": "^2.1.1",
+    "mysql2": "^3.22.0"
+  }
+}

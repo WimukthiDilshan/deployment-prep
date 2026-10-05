@@ -1,0 +1,21 @@
+# Local configuration (keep the documented template)
+.env
+.env.*
+!.env.example
+
+# Node dependencies and logs
+node_modules/
+*.log
+
+# Python caches, test output, and local virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Runtime uploads (keep the directory in Git)
+uploads/*
+!uploads/.gitkeep

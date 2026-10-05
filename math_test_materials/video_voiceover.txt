@@ -1,0 +1,25 @@
+VIDEO VOICEOVER SCRIPT
+Record this as the subsection video (keep it under 15 minutes; 60–90 seconds is enough).
+Speak clearly. You do not need to show the slides on camera.
+
+--- WHAT TO SAY ---
+
+Welcome to lecture four on the heat equation.
+
+Heat flux is proportional to the temperature gradient. Fourier's law says q equals minus k times the gradient of T. The minus sign means heat flows from hot to cold.
+
+Combining Fourier's law with conservation of energy gives the heat equation: the partial of u with respect to t equals alpha times the Laplacian of u. u is temperature, t is time, and alpha is thermal diffusivity. This is the educator formula that must be copied exactly.
+
+On a finite rod with zero temperature at both ends, we use separation of variables. Assume u of x t equals X of x times T of t. Then X double prime plus lambda X equals zero.
+
+The solution is a sine series: u of x t equals the sum of a n sine n pi x over L, times an exponential decay in time.
+
+Now a video-only extra, not written on the slides: in the lab we also non-dimensionalise so that alpha equals one, and we check the CFL condition when we discretise in time.
+
+That is the end of this short lecture.
+
+--- WHY THIS SCRIPT ---
+
+Overlaps the PPT and PDF on purpose (Fourier, heat equation, sine series) so dedupe can drop repeated prose.
+Keeps unique spoken lines: non-dimensionalise alpha equals one, and the lab CFL mention.
+When the maths tick is ON, the formulas should still appear as LaTeX in the knowledge chunk.

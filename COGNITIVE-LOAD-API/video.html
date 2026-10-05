@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Cognitive Load Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+        video {
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .box {
+            padding: 15px;
+            border: 1px solid #ccc;
+            width: 600px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        .option {
+            margin: 8px 0;
+        }
+
+        button {
+            padding: 8px 14px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Video-Based Cognitive Load Tracking</h2>
+
+    <video id="video" width="600" controls>
+        <source src="sample.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="box">
+        <p><span class="label">Pause Count:</span> <span id="pauseCount">0</span></p>
+        <p><span class="label">Seek Count:</span> <span id="seekCount">0</span></p>
+        <p><span class="label">Rewatch Count:</span> <span id="rewatchCount">0</span></p>
+        <p><span class="label">Playback Rate Changes:</span> <span id="rateChangeCount">0</span></p>
+        <p><span class="label">Idle Duration (sec):</span> <span id="idleDuration">0</span></p>
+        <p><span class="label">Prediction:</span> <span id="predictionResult">Waiting...</span></p>
+    </div>
+
+    <script>
+        const video = document.getElementById("video");
+
+        let pauseCount = 0;
+        let seekCount = 0;
+        let rewatchCount = 0;
+        let rateChangeCount = 0;
+        let idleDuration = 0;
+
+        let lastVideoTime = 0;
+        let idleStart = null;
+        let lastInteractionTime = Date.now();
+        let isSeeking = false;
+        let seekStartTime = 0;
+        let lastSeekEventTime = 0;
+        let lastRewatchEventTime = 0;
+        let lastPlaybackRate = video.playbackRate;
+        let suppressPauseCountUntil = 0;
+        let pauseConfirmTimeoutId = null;
+        let seekDragActive = false;
+        let seekGestureStartTime = 0;
+        let pendingSeekTarget = null;
+        let commitSeekTimeoutId = null;
+
+        // Required by the API schemas.
+        const studentId = "S001";
+        const lessonId = "L101";
+        const sessionId = `sess_${Date.now()}`;
+        const apiBaseUrl = "http://127.0.0.1:8021";
+        const windowDurationMs = 120000;
+        let currentMinuteIndex = 1;
+        let currentWindowStart = new Date();
+        let apiWarningShown = false;
+
+        const pauseCountEl = document.getElementById("pauseCount");
+        const seekCountEl = document.getElementById("seekCount");
+        const rewatchCountEl = document.getElementById("rewatchCount");
+        const rateChangeCountEl = document.getElementById("rateChangeCount");
+        const idleDurationEl = document.getElementById("idleDuration");
+        const predictionResultEl = document.getElementById("predictionResult");
+
+        function updateUI() {
+            pauseCountEl.textContent = pauseCount;
+            seekCountEl.textContent = seekCount;
+            rewatchCountEl.textContent = rewatchCount;
+            rateChangeCountEl.textContent = rateChangeCount;
+            idleDurationEl.textContent = idleDuration;
+        }
+
+        function markInteraction() {
+            if (idleStart) {
+                sendRawEvent({
+                    event_type: "idle_end"
+                });
+            }
+            lastInteractionTime = Date.now();
+            idleStart = null;
+        }
+
+        function showApiWarning(message) {
+            if (apiWarningShown) return;
+            apiWarningShown = true;
+            predictionResultEl.textContent = message;
+        }
+
+        function sendRawEvent(payload) {
+            fetch(`${apiBaseUrl}/events/raw`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    lesson_id: lessonId,
+                    session_id: sessionId,
+                    event_time: new Date().toISOString(),
+                    video_time: Number(video.currentTime.toFixed(2)),
+                    from_position: null,
+                    to_position: null,
+                    event_value: null,
+                    question_id: null,
+                    is_correct: null,
+                    ...payload
+                })
+            }).catch(error => {
+                console.error("Raw event API error:", error);
+                showApiWarning("Cognitive load API is not reachable on http://127.0.0.1:8021");
+            });
+        }
+
+        function isPauseFromSeek() {
+            const SEEK_PAUSE_GRACE_MS = 600;
+            const REWATCH_PAUSE_GRACE_MS = 3000;
+            const recentlySought = Date.now() - lastSeekEventTime < SEEK_PAUSE_GRACE_MS;
+            const recentlyRewatched = Date.now() - lastRewatchEventTime < REWATCH_PAUSE_GRACE_MS;
+            const inSuppressionWindow = Date.now() < suppressPauseCountUntil;
+            return isSeeking || video.seeking || recentlySought || recentlyRewatched || inSuppressionWindow;
+        }
+
+        function beginSeekGesture() {
+            if (!seekDragActive) {
+                seekDragActive = true;
+                seekGestureStartTime = seekStartTime;
+            }
+        }
+
+        function resetSeekGesture() {
+            seekDragActive = false;
+            pendingSeekTarget = null;
+            if (commitSeekTimeoutId) {
+                clearTimeout(commitSeekTimeoutId);
+                commitSeekTimeoutId = null;
+            }
+        }
+
+        // Detect seek start
+        video.addEventListener("seeking", () => {
+            isSeeking = true;
+            seekStartTime = lastVideoTime;
+            lastSeekEventTime = Date.now();
+            suppressPauseCountUntil = Date.now() + 2000;
+            beginSeekGesture();
+            markInteraction();
+        });
+
+        // Pause tracking
+        video.addEventListener("pause", () => {
+            const pausePosition = video.currentTime;
+
+            if (pauseConfirmTimeoutId) {
+                clearTimeout(pauseConfirmTimeoutId);
+            }
+
+            // Confirm after a short delay so seek/rewatch transient pauses are ignored.
+            pauseConfirmTimeoutId = setTimeout(() => {
+                const positionChanged = Math.abs(video.currentTime - pausePosition) > 0.15;
+
+                if (video.paused && !isPauseFromSeek() && !positionChanged) {
+                    pauseCount++;
+                    console.log("Pause count:", pauseCount);
+                    sendRawEvent({
+                        event_type: "pause",
+                        video_time: Number(pausePosition.toFixed(2))
+                    });
+                    updateUI();
+                }
+
+                pauseConfirmTimeoutId = null;
+            }, 350);
+
+            markInteraction();
+        });
+
+        // Play tracking
+        video.addEventListener("play", () => {
+            if (pauseConfirmTimeoutId) {
+                clearTimeout(pauseConfirmTimeoutId);
+                pauseConfirmTimeoutId = null;
+            }
+            sendRawEvent({
+                event_type: "play"
+            });
+            markInteraction();
+        });
+
+        // Seek tracking
+        video.addEventListener("seeked", () => {
+            lastSeekEventTime = Date.now();
+            suppressPauseCountUntil = Date.now() + 2000;
+
+            if (pauseConfirmTimeoutId) {
+                clearTimeout(pauseConfirmTimeoutId);
+                pauseConfirmTimeoutId = null;
+            }
+
+            pendingSeekTarget = Number(video.currentTime.toFixed(2));
+            markInteraction();
+            
+            if (commitSeekTimeoutId) {
+                clearTimeout(commitSeekTimeoutId);
+            }
+
+            commitSeekTimeoutId = setTimeout(() => {
+                const gestureStart = seekDragActive ? seekGestureStartTime : seekStartTime;
+                const finalTarget = Number(pendingSeekTarget ?? video.currentTime.toFixed(2));
+                const moveDistance = Math.abs(finalTarget - gestureStart);
+
+                if (moveDistance >= 0.5) {
+                    const isBackwardSeek = finalTarget < gestureStart - 0.25;
+
+                    if (isBackwardSeek) {
+                        rewatchCount++;
+                        lastRewatchEventTime = Date.now();
+                        suppressPauseCountUntil = Date.now() + 2500;
+                        console.log("Rewatch count:", rewatchCount);
+                        sendRawEvent({
+                            event_type: "seek_backward",
+                            from_position: Number(gestureStart.toFixed(2)),
+                            to_position: finalTarget
+                        });
+                    } else {
+                        seekCount++;
+                        console.log("Seek count:", seekCount);
+                        sendRawEvent({
+                            event_type: "seek_forward",
+                            from_position: Number(gestureStart.toFixed(2)),
+                            to_position: finalTarget
+                        });
+                    }
+
+                    updateUI();
+                }
+
+                isSeeking = false;
+                resetSeekGesture();
+            }, 250);
+
+            // Reset seek flag after pause/play events settle.
+            setTimeout(() => {
+                if (!commitSeekTimeoutId) {
+                    isSeeking = false;
+                }
+            }, 0);
+        });
+
+        // Playback rate change tracking
+        video.addEventListener("ratechange", () => {
+            const currentRate = video.playbackRate;
+
+            // Some browsers fire duplicate ratechange events for one user action.
+            if (currentRate === lastPlaybackRate) {
+                return;
+            }
+
+            lastPlaybackRate = currentRate;
+            rateChangeCount++;
+            sendRawEvent({
+                event_type: "rate_change",
+                event_value: String(currentRate)
+            });
+            markInteraction();
+            updateUI();
+            console.log("Playback rate changed:", rateChangeCount);
+        });
+
+        // Track current time
+        video.addEventListener("timeupdate", () => {
+            lastVideoTime = video.currentTime;
+        });
+
+        // Detect general user interaction
+        document.addEventListener("mousemove", markInteraction);
+        document.addEventListener("keydown", markInteraction);
+        document.addEventListener("click", markInteraction);
+
+        // Idle detection check every second
+        setInterval(() => {
+            const now = Date.now();
+            const inactiveMs = now - lastInteractionTime;
+
+            // If inactive for more than 60 seconds, start counting idle time
+            if (inactiveMs > 60000) {
+                if (!idleStart) {
+                    idleStart = now;
+                    sendRawEvent({
+                        event_type: "idle_start"
+                    });
+                } else {
+                    idleDuration += 1;
+                    updateUI();
+                }
+            }
+        }, 1000);
+
+        // Build feature window from raw logs and predict every 2 minutes
+        setInterval(() => {
+            const windowEnd = new Date();
+            const data = {
+                student_id: studentId,
+                lesson_id: lessonId,
+                session_id: sessionId,
+                minute_index: currentMinuteIndex,
+                window_start: currentWindowStart.toISOString(),
+                window_end: windowEnd.toISOString()
+            };
+
+            console.log("Sending raw window to API:", data);
+
+            fetch(`${apiBaseUrl}/predict/from-raw`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(async response => {
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(payload?.detail ? JSON.stringify(payload.detail) : "Request failed");
+                }
+
+                return payload;
+            })
+            .then(result => {
+                console.log("Prediction result:", result);
+                console.log("Extracted feature window:", result.feature_window);
+                predictionResultEl.textContent =
+                    `${result.prediction.predicted_label} (Score: ${result.prediction.predicted_score}, Confidence: ${result.prediction.confidence})`;
+            })
+            .catch(error => {
+                console.error("API error:", error);
+                predictionResultEl.textContent = "API error - check that the cognitive load API is running on port 8021";
+            });
+
+            // Reset counters for next 2-minute window
+            pauseCount = 0;
+            seekCount = 0;
+            rewatchCount = 0;
+            rateChangeCount = 0;
+            idleDuration = 0;
+            isSeeking = false;
+            currentWindowStart = windowEnd;
+            currentMinuteIndex += 1;
+            updateUI();
+
+        }, windowDurationMs);
+    </script>
+
+</body>
+</html>
