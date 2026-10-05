@@ -24,9 +24,12 @@ app.use('/api/exam', examRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/student-lesson-summaries', studentLessonSummaryRoutes);
 
-const mongoUri =
-  process.env.MONGO_URI ||
-  'mongodb+srv://root:root@userdb.n9pyyat.mongodb.net/?appName=UserDB';
+const mongoUri = process.env.MONGO_URI;
+
+if (!mongoUri) {
+  console.error('MONGO_URI is required. Set it in backend/.env or the service environment.');
+  process.exit(1);
+}
 
 mongoose
   .connect(mongoUri, { dbName: 'userdb' })
