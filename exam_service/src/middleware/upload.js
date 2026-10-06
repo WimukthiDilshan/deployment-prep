@@ -1,14 +1,17 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const crypto = require('crypto');
 const multer = require('multer');
 
 const uploadDirectory = path.resolve(__dirname, '../../uploads');
+const uploadTempDirectory = path.join(os.tmpdir(), 'exam-service-upload-tmp');
 fs.mkdirSync(uploadDirectory, { recursive: true });
+fs.mkdirSync(uploadTempDirectory, { recursive: true });
 
 const allowedExtensions = new Set(['.pdf', '.ppt', '.pptx']);
 const storage = multer.diskStorage({
-  destination: (_req, _file, callback) => callback(null, uploadDirectory),
+  destination: (_req, _file, callback) => callback(null, uploadTempDirectory),
   filename: (_req, file, callback) => {
     const extension = path.extname(file.originalname).toLowerCase();
     callback(null, `${Date.now()}-${crypto.randomUUID()}${extension}`);
@@ -28,4 +31,4 @@ const uploadDocument = multer({
   },
 });
 
-module.exports = { uploadDocument, uploadDirectory };
+module.exports = { uploadDocument, uploadDirectory, uploadTempDirectory };

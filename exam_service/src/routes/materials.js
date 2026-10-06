@@ -5,8 +5,9 @@ const multer = require('multer');
 
 const { pool } = require('../config/database');
 const requireTeacher = require('../middleware/auth');
-const { uploadDocument, uploadDirectory } = require('../middleware/upload');
+const { uploadDocument } = require('../middleware/upload');
 const { extractPdf } = require('../services/pdfExtraction');
+const { deleteStoredFile, openStoredFile, storeUploadedFile } = require('../services/fileStorage');
 
 const router = express.Router();
 
@@ -34,6 +35,7 @@ router.post('/', requireTeacher, runUpload, async (req, res) => {
   const documentType = extension === '.pdf' ? 'pdf' : 'presentation';
 
   let extraction = null;
+  let storedFilePath = null;
   try {
     if (documentType === 'pdf') {
       extraction = await extractPdf(req.file.path);
@@ -46,6 +48,8 @@ router.post('/', requireTeacher, runUpload, async (req, res) => {
       }
     }
 
+    storedFilePath = await storeUploadedFile(req.file);
+
     const connection = await pool.getConnection();
     let result;
     try {
@@ -57,8 +61,7 @@ router.post('/', requireTeacher, runUpload, async (req, res) => {
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           String(req.teacher.id), courseId, courseName, lessonName, unitNo, documentType,
-          req.file.originalname, req.file.filename,
-          path.relative(path.resolve(__dirname, '../..'), req.file.path).replace(/\\/g, '/'),
+          req.file.originalname, req.file.filename, storedFilePath,
           req.file.mimetype || 'application/octet-stream', req.file.size,
           extraction ? 'completed' : 'not_applicable', extraction ? new Date() : null,
         ]
@@ -93,6 +96,8 @@ router.post('/', requireTeacher, runUpload, async (req, res) => {
       connection.release();
     }
 
+    await fs.unlink(req.file.path).catch(() => {});
+
     return res.status(201).json({
       message: extraction
         ? 'Exam material uploaded and processed successfully.'
@@ -116,6 +121,11 @@ router.post('/', requireTeacher, runUpload, async (req, res) => {
     });
   } catch (error) {
     await fs.unlink(req.file.path).catch(() => {});
+    if (storedFilePath) {
+      await deleteStoredFile(storedFilePath, req.file.filename).catch((cleanupError) => {
+        console.error('Uploaded exam file cleanup failed:', cleanupError.message);
+      });
+    }
     console.error('Exam material upload failed:', error);
     return res.status(error.status || 500).json({
       message: error.status || error.message.startsWith('PDF extraction failed:')
@@ -210,18 +220,30 @@ router.get('/:id/images/:imageId', requireTeacher, async (req, res) => {
 });
 
 router.get('/:id/file', requireTeacher, async (req, res) => {
-  const [rows] = await pool.execute(
-    `SELECT original_file_name, stored_file_name FROM exam_materials
-     WHERE id = ? AND teacher_id = ? LIMIT 1`,
-    [req.params.id, String(req.teacher.id)]
-  );
-  if (!rows.length) return res.status(404).json({ message: 'Exam material not found.' });
+  try {
+    const [rows] = await pool.execute(
+      `SELECT original_file_name, stored_file_name, file_path, mime_type FROM exam_materials
+       WHERE id = ? AND teacher_id = ? LIMIT 1`,
+      [req.params.id, String(req.teacher.id)]
+    );
+    if (!rows.length) return res.status(404).json({ message: 'Exam material not found.' });
 
-  const filePath = path.resolve(uploadDirectory, rows[0].stored_file_name);
-  if (!filePath.startsWith(`${uploadDirectory}${path.sep}`)) {
-    return res.status(400).json({ message: 'Invalid stored file path.' });
+    const storedFile = await openStoredFile(rows[0].file_path, rows[0].stored_file_name);
+    res.attachment(rows[0].original_file_name);
+    res.set('Content-Type', storedFile.contentType || rows[0].mime_type || 'application/octet-stream');
+    storedFile.stream.on('error', (error) => {
+      console.error('Exam material download failed:', error.message);
+      if (!res.headersSent) res.status(404).json({ message: 'Exam material file is unavailable.' });
+      else res.destroy(error);
+    });
+    return storedFile.stream.pipe(res);
+  } catch (error) {
+    console.error('Exam material download failed:', error.message);
+    if (error.name === 'NoSuchKey' || error.code === 'ENOENT') {
+      return res.status(404).json({ message: 'Exam material file is unavailable.' });
+    }
+    return res.status(500).json({ message: 'Failed to download the exam material.' });
   }
-  return res.download(filePath, rows[0].original_file_name);
 });
 
 module.exports = router;
