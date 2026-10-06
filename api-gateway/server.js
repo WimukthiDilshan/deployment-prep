@@ -15,8 +15,7 @@ const DEEPSEEK_SERVICE_URL =
   process.env.DEEPSEEK_SERVICE_URL || "http://localhost:5004";
 const RESOURCE_UPLOAD_URL =
   process.env.RESOURCE_UPLOAD_URL || "http://localhost:5000";
-const GATEWAY_SHARED_SECRET =
-  process.env.GATEWAY_SHARED_SECRET || "resource_gateway_secret_2026";
+const GATEWAY_SHARED_SECRET = process.env.GATEWAY_SHARED_SECRET;
 const LIME_AI_SERVICE_URL =
   process.env.LIME_AI_SERVICE_URL || "http://localhost:8110";
 const SHAP_AI_SERVICE_URL =
@@ -30,19 +29,19 @@ const COGNITIVE_STYLE_SERVICE_URL =
 const COGNITIVE_STYLE_AI_URL =
   process.env.COGNITIVE_STYLE_AI_URL || "http://localhost:8112";
 
-const allowedOrigins = [
+const allowedOrigins = new Set([
   FRONTEND_URL,
   ...FRONTEND_URLS.split(",").map((origin) => origin.trim()).filter(Boolean),
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://127.0.0.1:5173",
-  "http://127.0.0.1:5174",
-];
+]);
+
+if (!GATEWAY_SHARED_SECRET) {
+  throw new Error("GATEWAY_SHARED_SECRET must be configured.");
+}
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.has(origin)) {
         callback(null, true);
         return;
       }
@@ -166,7 +165,7 @@ app.use(
       },
       proxyRes: (proxyRes, req) => {
         const origin = req.headers.origin;
-        if (origin && allowedOrigins.includes(origin)) {
+        if (origin && allowedOrigins.has(origin)) {
           proxyRes.headers["access-control-allow-origin"] = origin;
           proxyRes.headers["access-control-allow-credentials"] = "true";
           proxyRes.headers["access-control-expose-headers"] =
@@ -287,7 +286,7 @@ app.use(
 app.use(
   "/cognitive-style",
   createProxyMiddleware({
-    target: "http://localhost:8003",
+    target: COGNITIVE_STYLE_SERVICE_URL,
     changeOrigin: true,
     pathRewrite: (path) => path.replace(/^\/cognitive-style/, ""),
   })

@@ -10,7 +10,10 @@ const verifyToken = (req, res, next) => {
       .json({ message: "No token provided. Access denied." });
   }
 
-  const secret = process.env.JWT_SECRET || "fallback_secret_key";
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    return res.status(500).json({ message: "JWT authentication is not configured." });
+  }
 
   jwt.verify(token, secret, (err, decoded) => {
     if (err) {

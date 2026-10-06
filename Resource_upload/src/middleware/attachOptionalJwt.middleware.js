@@ -8,7 +8,8 @@ const attachOptionalJwt = (req, res, next) => {
   const token = authHeader && authHeader.split(" ")[1];
   if (!token) return next();
 
-  const secret = process.env.JWT_SECRET || "fallback_secret_key";
+  const secret = process.env.JWT_SECRET;
+  if (!secret) return next();
   jwt.verify(token, secret, (err, decoded) => {
     if (!err && decoded) {
       req.user = decoded;

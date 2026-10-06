@@ -27,6 +27,11 @@ if (!mongoUri) {
   process.exit(1);
 }
 
+if (!process.env.JWT_SECRET) {
+  console.error("JWT_SECRET is required in gpt-service/.env");
+  process.exit(1);
+}
+
 mongoose
   .connect(mongoUri, { dbName })
   .then(() => {

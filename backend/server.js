@@ -8,6 +8,13 @@ const port = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(express.json());
+app.get('/health', (_req, res) => {
+  const connected = mongoose.connection.readyState === 1;
+  res.status(connected ? 200 : 503).json({
+    status: connected ? 'ok' : 'database_disconnected',
+    service: 'backend',
+  });
+});
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -28,6 +35,11 @@ const mongoUri = process.env.MONGO_URI;
 
 if (!mongoUri) {
   console.error('MONGO_URI is required. Set it in backend/.env or the service environment.');
+  process.exit(1);
+}
+
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is required. Set it in backend/.env or the service environment.');
   process.exit(1);
 }
 

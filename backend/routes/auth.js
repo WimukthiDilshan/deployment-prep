@@ -8,7 +8,7 @@ const verifyToken = require('../middleware/verifyToken');
 
 const router = express.Router();
 
-const getJwtSecret = () => process.env.JWT_SECRET || 'fallback_secret_key';
+const getJwtSecret = () => process.env.JWT_SECRET;
 
 const requireAdmin = (req, res, next) => {
   if (req.user?.role !== 'Admin') {
@@ -191,8 +191,13 @@ router.post('/login', async (req, res) => {
 // Development admin login. Override both values in backend/.env for deployment.
 router.post('/admin/login', (req, res) => {
   const { email, password } = req.body;
-  const adminEmail = String(process.env.ADMIN_EMAIL || 'admin@gmail.com').trim().toLowerCase();
-  const adminPassword = String(process.env.ADMIN_PASSWORD || 'admin123');
+  const configuredAdminEmail = process.env.ADMIN_EMAIL;
+  const configuredAdminPassword = process.env.ADMIN_PASSWORD;
+  if (!configuredAdminEmail || !configuredAdminPassword) {
+    return res.status(503).json({ message: 'Admin login is not configured.' });
+  }
+  const adminEmail = String(configuredAdminEmail).trim().toLowerCase();
+  const adminPassword = String(configuredAdminPassword);
 
   if (
     String(email || '').trim().toLowerCase() !== adminEmail ||
