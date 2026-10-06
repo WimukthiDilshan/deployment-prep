@@ -1,4 +1,11 @@
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from fastapi import FastAPI
+from database.connection import client
 from routes.UserRoutes import router as user_router
 from fastapi.middleware.cors import CORSMiddleware
 from routes.VisualVerbalCursorRoutes import router as simple_router
@@ -17,9 +24,32 @@ from routes.VVDQuestionnaireRouter import router as osv_questionnaire_router
 
 app = FastAPI()
 
+
+@app.get("/health")
+async def health():
+    try:
+        await client.admin.command("ping")
+        return {"status": "ok", "service": "cognitive-style-backend", "database": "ok"}
+    except Exception:
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=503,
+            detail={"status": "database_disconnected", "service": "cognitive-style-backend"},
+        )
+frontend_origins = [
+    origin.strip()
+    for origin in (
+        os.getenv("FRONTEND_URL", "http://localhost:5173")
+        + ","
+        + os.getenv("FRONTEND_URLS", "http://localhost:5174")
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173","http://localhost:5174"],
+    allow_origins=frontend_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -54,5 +84,9 @@ app.include_router(ahs_questionnaire_router)
 app.include_router(osv_questionnaire_router)
 if __name__ == "__main__":
     import uvicorn
-    # Make sure "main:app" matches your filename (main.py) and FastAPI instance name (app)
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run(
+        "main:app",
+        host=os.getenv("HOST", "0.0.0.0"),
+        port=int(os.getenv("PORT", "8003")),
+        reload=os.getenv("RELOAD", "false").lower() == "true",
+    )
