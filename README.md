@@ -57,11 +57,12 @@ API Gateway :4000
   |-- /api/auth, /api/dashboard, /api/lessons -> backend :5001
   |-- /api/courses, /api/sections, /files -> Resource_upload :5000
   |-- /api/gpt -> gpt-service :5002
+  |-- /api/deepseek -> deepseek-service :5004
   |-- /api/cognitive-load -> COGNITIVE-LOAD-API
   |-- /api/lime-ai -> lime_ai :8110
   |-- /api/shap-ai -> sharp_ai :8011
   |-- /api/cognitive-style-ai -> cognitive_style_ai :8112
-  |-- /api/recommendation -> recommendation_ai
+  |-- /api/next-lesson-recommendation -> recommendation_ai :5003
   |-- /cognitive-style -> CognitiveStyleBackend :8003
 ```
 
@@ -82,14 +83,13 @@ API Gateway :4000
 | Auth/dashboard backend | `http://localhost:5001` |
 | Resource upload service | `http://localhost:5000` |
 | GPT service | `http://localhost:5002` |
-| Recommendation service | `http://localhost:5002` by default, but use a different `PORT` if running with `gpt-service` |
+| DeepSeek service | `http://localhost:5004` |
+| Recommendation service | `http://localhost:5003` |
 | Cognitive-load prediction API | commonly run on `http://127.0.0.1:8021` from its launcher |
 | LIME AI service | `http://localhost:8110` |
-| SHAP AI service | `http://localhost:8011` |
+| SHAP AI service | `http://localhost:8111` |
 | Cognitive style backend | `http://localhost:8003` |
 | Cognitive style explainability | `http://localhost:8112` |
-
-Note: both `gpt-service` and `recommendation_ai` default to port `5002`. Run one of them with a custom `PORT`, then update `GPT_SERVICE_URL` or `RECOMMENDATION_AI_URL` in `api-gateway/.env`.
 
 ## Prerequisites
 
@@ -115,27 +115,33 @@ VITE_API_GATEWAY_URL=http://localhost:4000
 ```env
 PORT=4000
 FRONTEND_URL=http://localhost:5173
-FRONTEND_URLS=http://localhost:5174,http://127.0.0.1:5173
+FRONTEND_URLS=http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174
 BACKEND_SERVICE_URL=http://localhost:5001
 GPT_SERVICE_URL=http://localhost:5002
+DEEPSEEK_SERVICE_URL=http://localhost:5004
 RESOURCE_UPLOAD_URL=http://localhost:5000
 LIME_AI_SERVICE_URL=http://localhost:8110
-SHAP_AI_SERVICE_URL=http://localhost:8011
-RECOMMENDATION_AI_URL=http://localhost:5003
+SHAP_AI_SERVICE_URL=http://localhost:8111
+NEXT_LESSON_RECOMMENDATION_URL=http://localhost:5003
 COGNITIVE_LOAD_SERVICE_URL=http://127.0.0.1:8021
 COGNITIVE_STYLE_SERVICE_URL=http://localhost:8003
 COGNITIVE_STYLE_AI_URL=http://localhost:8112
-GATEWAY_SHARED_SECRET=change_this_secret
+GATEWAY_SHARED_SECRET=replace_with_a_long_random_shared_secret
 ```
 
 ### `backend/.env`
 
 ```env
 PORT=5001
-MONGO_URI=mongodb://localhost:27017/userdb
-JWT_SECRET=change_this_secret
+MONGO_URI=mongodb://localhost:27017
+JWT_SECRET=replace_with_a_long_random_shared_jwt_secret
 RESOURCE_UPLOAD_URL=http://localhost:5000
-GATEWAY_SHARED_SECRET=change_this_secret
+API_GATEWAY_URL=http://localhost:4000
+EXAM_SERVICE_URL=http://localhost:8120
+LIME_AI_SERVICE_URL=http://localhost:8110
+GATEWAY_SHARED_SECRET=replace_with_a_long_random_shared_secret
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=replace_with_a_strong_password
 ```
 
 ### `Resource_upload/.env`
@@ -143,8 +149,8 @@ GATEWAY_SHARED_SECRET=change_this_secret
 ```env
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/upload_section
-JWT_SECRET=change_this_secret
-GATEWAY_SHARED_SECRET=change_this_secret
+JWT_SECRET=replace_with_a_long_random_shared_jwt_secret
+GATEWAY_SHARED_SECRET=replace_with_a_long_random_shared_secret
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
@@ -287,10 +293,14 @@ Start the services in separate terminals:
 
 ```text
 GET http://localhost:4000/
+GET http://localhost:5001/health
+GET http://localhost:5000/health
 GET http://localhost:5002/health
+GET http://localhost:5004/health
 GET http://127.0.0.1:8021/health
 GET http://localhost:8110/api/v1/health
-GET http://localhost:8011/api/v1/health
+GET http://localhost:8111/api/v1/health
+GET http://localhost:8003/health
 ```
 
 ## Important API Areas
@@ -305,10 +315,13 @@ GET http://localhost:8011/api/v1/health
 | `/api/public/courses/*` | `Resource_upload` | Public course reads. |
 | `/files/*` | `Resource_upload` | Uploaded file access. |
 | `/api/gpt/*` | `gpt-service` | GPT prompt and answer flows. |
+| `/api/deepseek/*` | `deepseek-service` | DeepSeek chat and model selection. |
 | `/api/cognitive-load/*` | `COGNITIVE-LOAD-API` | Prediction, raw event, feature-window, and XAI data routes. |
 | `/api/lime-ai/*` | `lime_ai` | Prediction persistence and LIME-related service routes. |
 | `/api/shap-ai/*` | `sharp_ai` | SHAP explanation service routes. |
-| `/api/recommendation/*` | `recommendation_ai` | Lesson analysis and teacher recommendations. |
+| `/api/cognitive-style-ai/*` | `cognitive_style_ai` | Saved cognitive-style analysis and feature explanations. |
+| `/api/next-lesson-recommendation/*` | `recommendation_ai` | Lesson analysis and teacher recommendations. |
+| `/api/exam/*` | `backend` then `exam_service` | Authenticated exam materials, quiz generation and answer handling. |
 | `/cognitive-style/*` | `CognitiveStyleBackend` | Gaze, cursor, cognitive style, assist question, and learner profile APIs. |
 
 ## Data Flow
