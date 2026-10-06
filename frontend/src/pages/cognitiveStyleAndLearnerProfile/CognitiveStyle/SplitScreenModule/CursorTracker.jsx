@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect, useRef, useImperativeHandle, forwardRef } from "react";
+import { getGatewayBaseUrl } from "../../../../config/gateway";
 
-const API_URL = "http://localhost:4000/cognitive-style/simple/cursor-summary";
+const API_URL = `${getGatewayBaseUrl()}/cognitive-style/simple/cursor-summary`;
 
 // Noise guard to stop accumulating time if the cursor stops moving
 const MAX_IDLE_GAP_MS = 250; 

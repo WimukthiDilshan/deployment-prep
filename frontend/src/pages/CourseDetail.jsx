@@ -29,42 +29,22 @@ import './CourseDetail.css';
 
 function buildGptAskUrls() {
   const base = getGatewayBaseUrl();
-  return [
-    `${base}/api/gpt/ask`,
-    'http://localhost:4000/api/gpt/ask',
-    'http://127.0.0.1:4000/api/gpt/ask',
-    'http://localhost:5002/api/gpt/ask',
-  ].filter((url, i, arr) => arr.indexOf(url) === i);
+  return [`${base}/api/gpt/ask`];
 }
 
 function buildDeepseekChatUrls() {
   const base = getGatewayBaseUrl();
-  return [
-    `${base}/api/deepseek/chat`,
-    'http://localhost:4000/api/deepseek/chat',
-    'http://127.0.0.1:4000/api/deepseek/chat',
-    'http://localhost:5004/api/deepseek/chat',
-  ].filter((url, i, arr) => arr.indexOf(url) === i);
+  return [`${base}/api/deepseek/chat`];
 }
 
 function buildSelectBestUrls() {
   const base = getGatewayBaseUrl();
-  return [
-    `${base}/api/deepseek/select-best`,
-    'http://localhost:4000/api/deepseek/select-best',
-    'http://127.0.0.1:4000/api/deepseek/select-best',
-    'http://localhost:5004/api/deepseek/select-best',
-  ].filter((url, i, arr) => arr.indexOf(url) === i);
+  return [`${base}/api/deepseek/select-best`];
 }
 
 function buildGptPromptUrls() {
   const base = getGatewayBaseUrl();
-  return [
-    `${base}/api/gpt/build-prompt`,
-    'http://localhost:4000/api/gpt/build-prompt',
-    'http://127.0.0.1:4000/api/gpt/build-prompt',
-    'http://localhost:5002/api/gpt/build-prompt',
-  ].filter((url, i, arr) => arr.indexOf(url) === i);
+  return [`${base}/api/gpt/build-prompt`];
 }
 
 const PLAYBACK_PROMPT_COPY = {

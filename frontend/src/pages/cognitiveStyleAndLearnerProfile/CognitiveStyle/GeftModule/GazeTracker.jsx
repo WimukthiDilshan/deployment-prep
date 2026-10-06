@@ -1,8 +1,9 @@
 import React, { useMemo, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { FilesetResolver, FaceLandmarker } from "@mediapipe/tasks-vision";
+import { getGatewayBaseUrl } from "../../../../config/gateway";
 
-const BACKEND_URL = "http://localhost:4000/cognitive-style/anaylticwholistic/savebehavioraldata"; // keep empty for now
+const BACKEND_URL = `${getGatewayBaseUrl()}/cognitive-style/anaylticwholistic/savebehavioraldata`;
 
 export default function GazeTracker({
   sessionActive = false,

@@ -3,9 +3,10 @@ import GazeTracker from "./GazeTracker";
 import QuestionView from "./QuestionView";
 import CalibrationScreen from "../Calibration/Calibration";
 import { useNavigate } from "react-router-dom";
+import { getGatewayBaseUrl } from "../../../../config/gateway";
 
 export default function QuestionRunner() {
-    const BACKEND_URL = "http://localhost:4000/cognitive-style/anaylticwholistic/savebehavioraldata";
+    const BACKEND_URL = `${getGatewayBaseUrl()}/cognitive-style/anaylticwholistic/savebehavioraldata`;
     const navigate = useNavigate();
 
     const userPayload = useMemo(() => {

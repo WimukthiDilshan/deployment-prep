@@ -5,8 +5,9 @@ import React, {
   useRef,
   forwardRef,
 } from "react";
+import { getGatewayBaseUrl } from "../../../../config/gateway";
 
-const BACKEND_URL = "http://localhost:4000/cognitive-style/question-runner/cursor"; // keep empty for now
+const BACKEND_URL = `${getGatewayBaseUrl()}/cognitive-style/question-runner/cursor`;
 
 const CursorTrackerForQuestionTracker = forwardRef(function CursorTrackerForQuestionTracker(
   {

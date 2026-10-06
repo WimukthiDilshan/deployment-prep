@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import GlobalProgressBar from "../../../components/GlobalProgressBar";
+import { getGatewayBaseUrl } from "../../../config/gateway";
 
 // These are the exact 18 items from the short ASSIST scale
 const questions = [
@@ -105,7 +106,7 @@ export default function AssistQuestionPage() {
     try {
       setLoading(true);
 
-      await fetch("http://localhost:4000/cognitive-style/assist-questions/", {
+      await fetch(`${getGatewayBaseUrl()}/cognitive-style/assist-questions/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

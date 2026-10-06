@@ -8,12 +8,7 @@ import TeacherWorkspaceLayout from '../components/TeacherWorkspaceLayout';
 
 function buildGptAskUrls() {
   const base = getGatewayBaseUrl();
-  return [
-    `${base}/api/gpt/ask`,
-    'http://localhost:4000/api/gpt/ask',
-    'http://127.0.0.1:4000/api/gpt/ask',
-    'http://localhost:5002/api/gpt/ask',
-  ].filter((url, i, arr) => arr.indexOf(url) === i);
+  return [`${base}/api/gpt/ask`];
 }
 
 const Gpt = () => {

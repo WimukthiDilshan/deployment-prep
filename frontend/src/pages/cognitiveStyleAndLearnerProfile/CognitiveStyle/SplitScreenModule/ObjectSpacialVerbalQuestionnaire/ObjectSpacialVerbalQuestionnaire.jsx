@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getGatewayBaseUrl } from "../../../../../config/gateway";
 
 // Complete 15-item VVQ Questions
 const VVQ_QUESTIONS = [
@@ -25,7 +26,7 @@ const scaleOptions = ["True", "False"];
 
 export default function VerbalizerVisualizerQuestionnaire() {
   // Update your endpoint URL as needed for the new VVQ structure
-  const BACKEND_URL = "http://localhost:4000/cognitive-style/vvq-questions/create"; 
+  const BACKEND_URL = `${getGatewayBaseUrl()}/cognitive-style/vvq-questions/create`;
   const location = useLocation();
   const navigate = useNavigate();
 

@@ -1,8 +1,9 @@
 import React, { useMemo, useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import Webcam from "react-webcam";
 import { FilesetResolver, FaceLandmarker } from "@mediapipe/tasks-vision";
+import { getGatewayBaseUrl } from "../../../../config/gateway";
 
-const BACKEND_URL = "http://localhost:4000/cognitive-style/gaze/event";
+const BACKEND_URL = `${getGatewayBaseUrl()}/cognitive-style/gaze/event`;
 
 const GazeTracker = forwardRef(({ sessionActive = true }, ref) => {
   const webcamRef = useRef(null);

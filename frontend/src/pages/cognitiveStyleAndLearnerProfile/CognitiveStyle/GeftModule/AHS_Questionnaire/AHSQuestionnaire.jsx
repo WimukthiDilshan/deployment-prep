@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import GlobalProgressBar from "../../../../../components/GlobalProgressBar";
+import { getGatewayBaseUrl } from "../../../../../config/gateway";
 
 // Complete 24-item AHS Questions
 const AHS_QUESTIONS = [
@@ -33,7 +34,7 @@ const AHS_QUESTIONS = [
 const scaleOptions = [1, 2, 3, 4, 5, 6, 7];
 
 export default function AHSQuestionnaire() {
-  const BACKEND_URL = "http://localhost:4000/cognitive-style/anaylticwholistic/ahsquestionnaire";
+  const BACKEND_URL = `${getGatewayBaseUrl()}/cognitive-style/anaylticwholistic/ahsquestionnaire`;
   const location = useLocation();
   const navigate = useNavigate();
 

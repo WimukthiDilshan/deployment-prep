@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { getGatewayBaseUrl } from "../../../../config/gateway";
 import CursorTracker from "./CursorTracker";
 import GazeTracker from "./GazeTracker2";
 import CalibrationScreen from "../Calibration/Calibration"; // Make sure the path is correct for your project
@@ -36,7 +37,7 @@ function Module2() {
     }
 
     // Notice there is no 'await' here. This ensures it runs in the background.
-    fetch(`http://localhost:4000/cognitive-style/predict/save/${userId}`, {
+    fetch(`${getGatewayBaseUrl()}/cognitive-style/predict/save/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
